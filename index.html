@@ -10,44 +10,75 @@
 </head>
 <body>
 
-    <!-- AUTOPLAY MUSIC PLAYLIST (REAL AUTOPLAY HACK) -->
-    <audio id="autoPlayer" autoplay muted></audio>
+    <!-- AUTOPLAY MUSIC PLAYLIST -->
+    <audio id="autoPlayer"></audio>
 
     <script>
         const playlist = [
-            "https://files.catbox.moe/93qqgt.mp3"
-            "https://files.catbox.moe/9j3h6k.m4a"
-            "https://files.catbox.moe/8j6igq.mp3"
-            "https://files.catbox.moe/b4bqcn.mp3"
-            "https://files.catbox.moe/8w7ssm.mp3"
-            "https://files.catbox.moe/19p1xw.mp3"
-            "https://files.catbox.moe/fzs9st.mp3"
-            "https://files.catbox.moe/e8u2cu.mp3"
-            "https://files.catbox.moe/jryxjt.mp3"
-            "https://files.catbox.moe/h4gnh5.mp3"
+            "https://files.catbox.moe/93qqgt.mp3",
+            "https://files.catbox.moe/9j3h6k.m4a",
+            "https://files.catbox.moe/8j6igq.mp3",
+            "https://files.catbox.moe/b4bqcn.mp3",
+            "https://files.catbox.moe/8w7ssm.mp3",
+            "https://files.catbox.moe/19p1xw.mp3",
+            "https://files.catbox.moe/fzs9st.mp3",
+            "https://files.catbox.moe/e8u2cu.mp3",
+            "https://files.catbox.moe/jryxjt.mp3",
+            "https://files.catbox.moe/h4gnh5.mp3",
             "https://files.catbox.moe/sz8ia6.mp3"
         ];
 
         let currentIndex = 0;
         const player = document.getElementById("autoPlayer");
+        let audioStarted = false;
 
-        // Set audio pertama (mute agar lolos autoplay policy)
-        player.src = playlist[currentIndex];
-        player.volume = 0;
-        player.play().catch(() => {});
+        // Function untuk mulai audio
+        function playAudio() {
+            if (audioStarted) return;
+            
+            player.src = playlist[currentIndex];
+            player.volume = 0.3;
+            
+            const playPromise = player.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    audioStarted = true;
+                    console.log('Audio playing successfully!');
+                }).catch(error => {
+                    console.log('Autoplay prevented:', error);
+                });
+            }
+        }
 
-        // Setelah 1.2 detik → unmute → volume naik otomatis
-        setTimeout(() => {
-            player.muted = false;
-            player.volume = 0.5;
-        }, 1200);
-
-        // Jika lagu selesai → lanjut ke lagu berikutnya
+        // Event untuk next track
         player.addEventListener("ended", () => {
             currentIndex = (currentIndex + 1) % playlist.length;
             player.src = playlist[currentIndex];
-            player.play().catch(() => {});
+            player.play();
         });
+
+        // Coba play langsung saat page load
+        window.addEventListener('load', () => {
+            playAudio();
+        });
+
+        // Fallback: Play on first user interaction
+        const startOnInteraction = () => {
+            playAudio();
+            document.removeEventListener('click', startOnInteraction);
+            document.removeEventListener('touchstart', startOnInteraction);
+            document.removeEventListener('scroll', startOnInteraction);
+        };
+
+        document.addEventListener('click', startOnInteraction);
+        document.addEventListener('touchstart', startOnInteraction);
+        document.addEventListener('scroll', startOnInteraction);
+
+        // Extra fallback: play after small delay
+        setTimeout(() => {
+            playAudio();
+        }, 1000);
     </script>
     <header>
         <nav class="navbar">
@@ -76,7 +107,7 @@
             <div class="container">
                 <div class="home-content">
                     <div class="home-text">
-                        <div class="greeting">👋 Hello there!</div>
+                        <div class="greeting">ola welcome to my portfolio!</div>
                         <h1 class="hero-title">I'm <span class="accent">Reyy</span></h1>
                         <h2 class="hero-subtitle" id="rotating-profession">Web Developer</h2>
                         <p class="hero-desc">Passionate full-stack developer with 5+ years of experience creating beautiful, functional, and user-friendly websites and applications. I specialize in modern web technologies and love turning complex problems into simple, elegant solutions.</p>
@@ -621,7 +652,7 @@
                             </div>
                             <div class="contact-details">
                                 <h3>Email</h3>
-                                <p>RyyZhouu@example.com</p>
+                                <p>ryyxiaoyan@gmail.com</p>
                                 <a href="mailto:ryyxiaoyan@gmail.com">Send Email</a>
                             </div>
                         </div>
