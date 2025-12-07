@@ -11,7 +11,7 @@
 <body>
 
     <!-- AUTOPLAY MUSIC PLAYLIST -->
-    <audio id="autoPlayer"></audio>
+    <audio id="autoPlayer" preload="auto"></audio>
 
     <script>
         const playlist = [
@@ -30,55 +30,59 @@
 
         let currentIndex = 0;
         const player = document.getElementById("autoPlayer");
-        let audioStarted = false;
+        let hasPlayed = false;
 
-        // Function untuk mulai audio
-        function playAudio() {
-            if (audioStarted) return;
+        // Setup audio
+        player.volume = 0.4;
+        player.loop = false;
+
+        // Load first song
+        player.src = playlist[currentIndex];
+
+        // Function untuk force play
+        function forcePlay() {
+            if (hasPlayed) return;
             
-            player.src = playlist[currentIndex];
-            player.volume = 0.3;
-            
-            const playPromise = player.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    audioStarted = true;
-                    console.log('Audio playing successfully!');
-                }).catch(error => {
-                    console.log('Autoplay prevented:', error);
-                });
-            }
+            player.play().then(() => {
+                hasPlayed = true;
+                console.log('✅ Audio started!');
+            }).catch(err => {
+                console.log('❌ Play failed:', err.message);
+            });
         }
 
-        // Event untuk next track
-        player.addEventListener("ended", () => {
+        // Auto next track
+        player.addEventListener('ended', () => {
             currentIndex = (currentIndex + 1) % playlist.length;
             player.src = playlist[currentIndex];
             player.play();
         });
 
-        // Coba play langsung saat page load
-        window.addEventListener('load', () => {
-            playAudio();
+        // AGGRESSIVE AUTOPLAY ATTEMPTS
+        
+        // 1. Immediately on script load
+        forcePlay();
+
+        // 2. On DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', forcePlay);
+
+        // 3. On window load
+        window.addEventListener('load', forcePlay);
+
+        // 4. On any user interaction (PALING PENTING!)
+        ['click', 'touchstart', 'touchend', 'mousedown', 'keydown', 'scroll'].forEach(event => {
+            document.addEventListener(event, forcePlay, { once: true });
         });
 
-        // Fallback: Play on first user interaction
-        const startOnInteraction = () => {
-            playAudio();
-            document.removeEventListener('click', startOnInteraction);
-            document.removeEventListener('touchstart', startOnInteraction);
-            document.removeEventListener('scroll', startOnInteraction);
-        };
+        // 5. Delayed attempts
+        setTimeout(forcePlay, 500);
+        setTimeout(forcePlay, 1500);
+        setTimeout(forcePlay, 3000);
 
-        document.addEventListener('click', startOnInteraction);
-        document.addEventListener('touchstart', startOnInteraction);
-        document.addEventListener('scroll', startOnInteraction);
-
-        // Extra fallback: play after small delay
-        setTimeout(() => {
-            playAudio();
-        }, 1000);
+        // 6. On visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) forcePlay();
+        });
     </script>
     <header>
         <nav class="navbar">
