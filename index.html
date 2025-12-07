@@ -10,80 +10,82 @@
 </head>
 <body>
 
-    <!-- AUTOPLAY MUSIC PLAYLIST -->
-    <audio id="autoPlayer" preload="auto"></audio>
+    <!-<!-- AUTOPLAY MUSIC PLAYLIST (REAL AUTOPLAY HACK) -->
+<audio id="autoPlayer" preload="auto"></audio>
 
-    <script>
-        const playlist = [
-            "https://files.catbox.moe/93qqgt.mp3",
-            "https://files.catbox.moe/9j3h6k.m4a",
-            "https://files.catbox.moe/8j6igq.mp3",
-            "https://files.catbox.moe/b4bqcn.mp3",
-            "https://files.catbox.moe/8w7ssm.mp3",
-            "https://files.catbox.moe/19p1xw.mp3",
-            "https://files.catbox.moe/fzs9st.mp3",
-            "https://files.catbox.moe/e8u2cu.mp3",
-            "https://files.catbox.moe/jryxjt.mp3",
-            "https://files.catbox.moe/h4gnh5.mp3",
-            "https://files.catbox.moe/sz8ia6.mp3"
-        ];
+<script>
+    const playlist = [
+        "https://files.catbox.moe/93qqgt.mp3",
+        "https://files.catbox.moe/9j3h6k.m4a",
+        "https://files.catbox.moe/8j6igq.mp3",
+        "https://files.catbox.moe/b4bqcn.mp3",
+        "https://files.catbox.moe/8w7ssm.mp3",
+        "https://files.catbox.moe/19p1xw.mp3",
+        "https://files.catbox.moe/fzs9st.mp3",
+        "https://files.catbox.moe/e8u2cu.mp3",
+        "https://files.catbox.moe/jryxjt.mp3",
+        "https://files.catbox.moe/h4gnh5.mp3",
+        "https://files.catbox.moe/sz8ia6.mp3"
+    ];
 
-        let currentIndex = 0;
-        const player = document.getElementById("autoPlayer");
-        let hasPlayed = false;
+    let currentIndex = 0;
+    let audioInitialized = false;
+    const player = document.getElementById("autoPlayer");
+    
+    // Setup player
+    player.volume = 0.4;
+    player.src = playlist[currentIndex];
 
-        // Setup audio
-        player.volume = 0.4;
-        player.loop = false;
-
-        // Load first song
-        player.src = playlist[currentIndex];
-
-        // Function untuk force play
-        function forcePlay() {
-            if (hasPlayed) return;
-            
-            player.play().then(() => {
-                hasPlayed = true;
-                console.log('✅ Audio started!');
-            }).catch(err => {
-                console.log('❌ Play failed:', err.message);
-            });
-        }
-
-        // Auto next track
-        player.addEventListener('ended', () => {
-            currentIndex = (currentIndex + 1) % playlist.length;
-            player.src = playlist[currentIndex];
-            player.play();
-        });
-
-        // AGGRESSIVE AUTOPLAY ATTEMPTS
+    // Function untuk start audio
+    function initAudio() {
+        if (audioInitialized) return;
         
-        // 1. Immediately on script load
-        forcePlay();
-
-        // 2. On DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', forcePlay);
-
-        // 3. On window load
-        window.addEventListener('load', forcePlay);
-
-        // 4. On any user interaction (PALING PENTING!)
-        ['click', 'touchstart', 'touchend', 'mousedown', 'keydown', 'scroll'].forEach(event => {
-            document.addEventListener(event, forcePlay, { once: true });
+        player.play().then(() => {
+            audioInitialized = true;
+            console.log('🎵 Music started!');
+        }).catch(err => {
+            console.log('⏸️ Waiting for user interaction...');
         });
+    }
 
-        // 5. Delayed attempts
-        setTimeout(forcePlay, 500);
-        setTimeout(forcePlay, 1500);
-        setTimeout(forcePlay, 3000);
+    // Auto next song
+    player.addEventListener('ended', () => {
+        currentIndex = (currentIndex + 1) % playlist.length;
+        player.src = playlist[currentIndex];
+        player.play();
+    });
 
-        // 6. On visibility change
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) forcePlay();
+    // Multiple autoplay triggers
+    // 1. Coba langsung
+    initAudio();
+
+    // 2. Setelah DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAudio);
+    }
+
+    // 3. Setelah window load
+    window.addEventListener('load', initAudio);
+
+    // 4. PALING PENTING: On user interaction
+    const userEvents = ['click', 'touchstart', 'touchend', 'keydown', 'mousemove', 'scroll'];
+    
+    function handleInteraction() {
+        initAudio();
+        // Remove listeners setelah berhasil
+        userEvents.forEach(event => {
+            document.removeEventListener(event, handleInteraction);
         });
-    </script>
+    }
+
+    userEvents.forEach(event => {
+        document.addEventListener(event, handleInteraction, { once: true, passive: true });
+    });
+
+    // 5. Delayed attempts
+    setTimeout(initAudio, 500);
+    setTimeout(initAudio, 2000);
+        </script>
     <header>
         <nav class="navbar">
             <div class="nav-brand">Reyy.py<span class="brand-dot">.</span></div>
