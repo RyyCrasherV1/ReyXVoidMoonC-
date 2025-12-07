@@ -9,6 +9,46 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!-- AUTOPLAY MUSIC PLAYLIST (REAL AUTOPLAY HACK) -->
+    <audio id="autoPlayer" autoplay muted></audio>
+
+    <script>
+        const playlist = [
+            "https://files.catbox.moe/93qqgt.mp3",
+            "https://files.catbox.moe/9j3h6k.m4a",
+            "https://files.catbox.moe/8j6igq.mp3",
+            "https://files.catbox.moe/b4bqcn.mp3",
+            "https://files.catbox.moe/8w7ssm.mp3",
+            "https://files.catbox.moe/19p1xw.mp3",
+            "https://files.catbox.moe/fzs9st.mp3",
+            "https://files.catbox.moe/e8u2cu.mp3",
+            "https://files.catbox.moe/jryxjt.mp3",
+            "https://files.catbox.moe/h4gnh5.mp3",
+            "https://files.catbox.moe/sz8ia6.mp3"
+        ];
+
+        let currentIndex = 0;
+        const player = document.getElementById("autoPlayer");
+
+        // Set audio pertama (mute agar lolos autoplay policy)
+        player.src = playlist[currentIndex];
+        player.volume = 0;
+        player.play().catch(() => {});
+
+        // Setelah 1.2 detik → unmute → volume naik otomatis
+        setTimeout(() => {
+            player.muted = false;
+            player.volume = 0.5;
+        }, 1200);
+
+        // Jika lagu selesai → lanjut ke lagu berikutnya
+        player.addEventListener("ended", () => {
+            currentIndex = (currentIndex + 1) % playlist.length;
+            player.src = playlist[currentIndex];
+            player.play().catch(() => {});
+        });
+    </script>
     <header>
         <nav class="navbar">
             <div class="nav-brand">Reyy.py<span class="brand-dot">.</span></div>
